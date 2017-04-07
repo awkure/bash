@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+cp $@ $@.backup-`date +%y%m%d`
+echo "`date +%Y-%m-%d` backed up $PWD/$@" >> ~/.backups.log

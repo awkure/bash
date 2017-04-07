@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+
+function usage {
+    echo "usage: $0 [filename]" 
+    exit 
+}
+
+if [ $# -eq 0 ]
+then
+    usage
+fi
+
+case $1 in
+    -h|--help)
+        usage
+        ;;
+     *)
+        filename=$1
+        ;;
+esac
+
+curl -i -s -F name=$filename -F file=@$filename https://lewd.se/api.php?d=upload-tool | tail -1
+echo 

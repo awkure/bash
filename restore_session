@@ -1,0 +1,40 @@
+#!/usr/bin/env sh
+
+function usage {
+    echo "usage: $0 [links]"
+    exit
+}
+
+function openFee
+{
+    local allinks=($(cat "${1}"))
+    firefox "${allinks[@]}"
+}
+
+if [ $# -eq 0 ];
+then
+
+    if [ ! -f ~/.links ];
+    then
+        echo "No '~/.links' file provided"
+        exit 8
+    else
+        linkdir=~/.links
+    fi
+
+fi
+
+case $1 in
+    -h|--help)
+        usage
+        ;;
+     *)
+        linkdir=$1
+        ;;
+esac
+
+ls -x "${linkdir}"
+echo "Which session to open?"
+read session
+
+openFee "${firefoxdir}/${session}"

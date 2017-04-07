@@ -1,0 +1,45 @@
+#!/usr/bin/env sh
+
+function usage {
+    echo "usage: $0 [board] [thread]"
+    exit
+}
+
+function proceed {
+    echo "Saving links from /${1}/ thread ${2}..."
+    lynx -dump -listonly -nonumbers "https://boards.4chan.org/${1}/thread/${2}" > "tmp_links_${1}_${2}"
+
+    local pagename=$(wget -qO- "https://boards.4chan.org/${1}/thread/${2}" | perl -l -0777 -ne 'print $1 if /<title.*?>\s*(.*?)(?: - 4chan)?\s*<\/title/si')
+    echo "$pagename"
+    pagename=$(echo "$pagename" | tr / _)
+
+    echo "Collecting image links..."
+    grep "i.4cdn.org" "tmp_links_${1}_${2}" > "tmp_image_links_${1}_${2}"
+
+    sort "tmp_image_links_${1}_${2}" | uniq > "tmp_image_links_sorted_${1}_${2}"
+    echo "Found $(cat tmp_image_links_sorted_${1}_${2} | wc -l) images"
+
+    echo "Downloading images..."
+    wget --input-file="tmp_image_links_sorted_${1}_${2}" --no-clobber --quiet --directory-prefix="${1}/${2} (${pagename})"
+
+    echo "Tidying..."
+    rm "tmp_links_${1}_${2}"
+    rm "tmp_image_links_${1}_${2}"
+    rm "tmp_image_links_sorted_${1}_${2}"
+    exit
+}
+
+if [ $# -eq 0 ]
+then
+    usage
+fi
+
+case $1 in
+    -h|--help)
+        usage
+        ;;
+     *)
+        proceed
+        ;;
+esac
+

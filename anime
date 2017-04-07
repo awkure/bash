@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+SHOW="http://www.animeonhand.com/watch/$1/"$1"-$2"
+curl -s -L $SHOW | egrep -o "http\:\/\/cdn[0-9]+\.hostyourmediafiles\.com\/media\/[a-z]+\/[0-9]+\/[a-z\_]+\.mp4" | uniq | mpv

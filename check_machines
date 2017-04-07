@@ -1,0 +1,38 @@
+#!/usr/bin/env sh
+
+if [ $# -eq 0 ];
+then
+
+    if [ ! -f ~/.machines ];
+    then 
+        echo "No '~/.machines' file provided"
+        exit 8
+    else
+        list="~/.machines"
+    fi
+
+fi
+
+c=0
+while machine='' read -r line || [[ -n "$line" ]]; do
+    
+    if ping -q -c 1 $machine >& /dev/null; then
+        state=OK
+    else
+        state=FAIL
+    fi
+  
+    printf '%4s %s\n' "($((++c)))" "${(r:25::.:):-$machine } CONNECTION $state"
+
+done < "$1"
+
+case $1 in
+    -h|--help)
+        echo "usage: $0 [filename] (default: '~/.machines')\n" 
+    
+        exit 
+        ;;
+     *)
+        list=$1
+        ;;
+esac

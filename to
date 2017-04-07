@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+cd $(sed "s|\.|./.|g" <<< $1)
+printf "$1/$(pwd | sed 's#.*/##')\n"

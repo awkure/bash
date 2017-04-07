@@ -1,0 +1,40 @@
+#!/usr/bin/env sh
+
+OLD_IFS="${IFS}"
+    IFS=":"
+    ARR=( $1 )
+SECONDS=$((  (ARR[0] * 60 * 60) + (ARR[1] * 60) + ARR[2]  ))
+  START=$(date +%s)
+    END=$((START + SECONDS))
+    CUR=$START
+
+function usage {
+    echo "  usage: $0 [format]\n"
+    echo "example: $0 \"0:1:42\"\n"
+    exit
+}
+
+if [ $# -eq 0 ]
+then
+    usage
+fi
+
+case $1 in
+    -h|--help)
+        usage
+        ;;
+esac
+
+while [[ $CUR -lt $END ]]; do
+    CUR=$(date +%s)
+    LEFT=$((END-CUR))
+                
+    clear
+    printf "\r%02d:%02d:%02d" \
+            $((LEFT/3600)) $(( (LEFT/60)%60)) $((LEFT%60)) 
+    
+    sleep 1
+done
+
+IFS="${OLD_IFS}"
+echo 
