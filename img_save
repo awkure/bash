@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 function usage {
-    echo "usage: $0 [board] [thread]"
+    echo "usage: `basename \"$0\"` [board] [thread]"
     exit
 }
 

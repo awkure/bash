@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+
+if [ "$#" -ne 1 ]; then
+    echo "usage: `basename \"$0\"` url"
+    exit
+fi
+
+wget \
+    --no-clobber \
+    --recursive \
+    --page-requisites \
+    --html-extension \
+    --convert-links \
+    --restrict-file-names=windows \
+    --domains $(domain $1) \
+    --no-parent \
+        $1

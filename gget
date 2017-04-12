@@ -1,0 +1,112 @@
+#!/usr/bin/env sh
+
+# Downloads a gopher file or directory to the current directory
+# Only uses port 70 for now, as I've never seen a gopher server
+# use anything else.
+#
+# If called on a directory, it will download all of the urls that
+# link to files within the directory or at deeper levels.
+#
+# So for example if a directory has a gophermap that links to stuff
+# on other servers or outside the directory, they will be ignored.
+#
+# Warning: this overwrites files without any prompt
+# by lolisamurai
+
+if [ "$#" -ne 1 ]; then
+    echo "usage: `basename \"$0\"` gopher://domain.abc/path/to/file"
+    exit
+fi
+
+function pushd {
+    command pushd "$@" > /dev/null
+}
+
+function popd {
+    command popd "$@" > /dev/null
+}
+
+selfpath="$0"
+url="$1"
+
+url="${url#*//}" # strip protocol
+
+domain=$(domain "gopher://$url")
+path="/${url#*/}" # strip domain
+
+echo $path
+
+map="$(mktemp)"
+echo "$path" | nc $domain 70 > "$map"
+
+cat "$map" |
+{
+# we need these brackets do to everything in the subshell and
+# retain the value of $quit
+
+while read line
+do
+    # this is not a gophermap, therefore use the output as a
+    # single file download
+    if ! [[ $line =~ ^[0135789ghiIds\;cM.].*$ ]]
+    then
+        filename="$(basename "$path")"
+        cp "$map" "$filename"
+        exit
+    fi
+done
+
+
+cat "$map" | while read line
+do
+    # these are all the prefixes for filetypes and directories
+    if [[ $line =~ ^[0159ghIds\;cM].*$ ]]
+    then
+        split=()
+        IFS=$'\t' read -r -a split <<< "$line"
+
+        # the link name becomes the selector if the selector is
+        # omitted
+        selector="${split[0]}"
+
+        if [[ "${split[1]}" ]]; then
+            selector="${split[1]}"
+        fi
+
+        # no domain means current domain
+        # ignore urls outside current domain
+        if ! [[ "${split[2]}" ]] || \
+             [[ "${split[2]}" = "$domain" ]]
+        then
+            isdir=0
+            if [[ $line =~ ^[1].*$ ]]
+            then
+                isdir=1
+            fi
+
+            # extract relative path by removing $path from the
+            # selector
+            relative="$(echo $selector | sed -e "s|$path||g")"
+
+            # Recurse directory or download file if the file is
+            # at a deeper level than the current directory
+            case $selector/ in
+              $path*)
+                  [[ $isdir -eq 1 ]] && \
+                      mkdir -p "./$relative" && \
+                      pushd "./$relative"
+
+                  # !!!! recursion !!!!
+                  $selfpath "$(echo "$url/$relative" | \
+                      sed -e 's|//|/|g')"
+
+                  [[ $isdir -eq 1 ]] && popd
+                  ;;
+            esac
+        fi
+        # end domain check
+    fi
+    # end type check
+done
+}
+# end cat "$map"

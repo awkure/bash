@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+
+# Recursively runs convmv on a path with every possible charset.
+# By running this and scrolling through the output, it is possible
+# to determine an unknown charset.
+#
+# Requires convmv.
+#
+# by lolisamurai
+
+if [ "$#" -ne 1 ]; then
+    echo "usage: `basename \"$0\"` path"
+    exit
+fi
+
+for enc in `convmv --list`; do
+    printf "%72s\n" | tr " " -
+    echo "# Testing $enc"
+    echo ""
+    yes | convmv -f $enc -t utf8 -r $1
+    printf "%72s\n" | tr " " -
+    echo ""
+done

@@ -9,8 +9,8 @@ SECONDS=$((  (ARR[0] * 60 * 60) + (ARR[1] * 60) + ARR[2]  ))
     CUR=$START
 
 function usage {
-    echo "  usage: $0 [format]\n"
-    echo "example: $0 \"0:1:42\"\n"
+    echo "  usage: `basename \"$0\"` [format]\n"
+    echo "example: `basename \"$0\"` \"0:1:42\"\n"
     exit
 }
 

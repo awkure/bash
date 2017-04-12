@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+date +%F_%H-%M-%S_%N_$$_$(od -A n -t u -N 4 /dev/urandom | xargs)

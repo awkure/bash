@@ -28,7 +28,7 @@ done < "$1"
 
 case $1 in
     -h|--help)
-        echo "usage: $0 [filename] (default: '~/.machines')\n" 
+        echo "usage: `basename \"$0\"` [filename] (default: '~/.machines')\n" 
     
         exit 
         ;;
