@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 #
 # GPG keysigning utility, because it's uberannoying to type all these commands
 # over and over again.

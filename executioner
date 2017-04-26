@@ -2,13 +2,15 @@
 
 set -vx --
 
-function killit {
+function killit ()
+{
     trap - ALRM
     kill -ALRM $prog 2>/dev/null
     kill -9 $! 2>/dev/null && exit 0
 }
 
-function waitforit {
+function waitforit ()
+{
     trap "killit" ALRM
     sleep $1& wait
     kill -ALRM $$
