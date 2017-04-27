@@ -18,13 +18,18 @@ if [ "$#" -ne 1 ]; then
     exit
 fi
 
-function pushd {
+
+function pushd ()
+{
     command pushd "$@" > /dev/null
 }
 
-function popd {
+
+function popd  ()
+{
     command popd "$@" > /dev/null
 }
+
 
 selfpath="$0"
 url="$1"

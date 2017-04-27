@@ -1,11 +1,12 @@
 #!/usr/bin/env sh
 
-function usage {
+function usage ()
+{
     echo "usage: `basename \"$0\"` [links]"
     exit
 }
 
-function openFee
+function openFee ()
 {
     local allinks=($(cat "${1}"))
     firefox "${allinks[@]}"
@@ -25,12 +26,8 @@ then
 fi
 
 case $1 in
-    -h|--help)
-        usage
-        ;;
-     *)
-        linkdir=$1
-        ;;
+    -h|--help) usage        ;;
+     *)        linkdir=$1   ;;
 esac
 
 ls -x "${linkdir}"

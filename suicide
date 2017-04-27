@@ -1,11 +1,13 @@
 #!/usr/bin/env sh
 
-function usage {
+function usage ()
+{
     echo "usage: `basename \"$0\"` [retardation level]"
     exit
 }
 
-function speak {
+function speak ()
+{
     espeak -x --ipa=1 -s 130 -p 30 -k 20 "What commercialism has brought into Linux has been the incentive to make a good distribution that is easy to use and that has all the packaging issues worked out!" 2>/dev/null
 }
 

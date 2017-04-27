@@ -7,30 +7,35 @@ fi
 
 search_url='https://google.com/search?q='
 
-function usage {
+
+function usage () 
+{
     echo "usage: how do(es) thing work"
     exit
 }
 
-function browse {
+
+function browse () 
+{
     $HOW_BROWSER "${search_url}$*"
 }
 
-function manpage {
+
+function manpage () 
+{
     man $* 2>/dev/null
     if [ $? -eq 0 ]; then
         exit
     fi
 }
 
+
 if [ -z "$1" ]; then
     usage
 fi
 
 case $1 in 
-    -h|--help)
-        usage
-        ;;
+    -h|--help) usage ;;
 esac
 
 if echo $@ | grep -E 'do(es)? .* work\??' >/dev/null; then

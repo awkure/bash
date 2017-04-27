@@ -8,7 +8,8 @@ SECONDS=$((  (ARR[0] * 60 * 60) + (ARR[1] * 60) + ARR[2]  ))
     END=$((START + SECONDS))
     CUR=$START
 
-function usage {
+function usage () 
+{
     echo "  usage: `basename \"$0\"` [format]\n"
     echo "example: `basename \"$0\"` \"0:1:42\"\n"
     exit
@@ -20,9 +21,7 @@ then
 fi
 
 case $1 in
-    -h|--help)
-        usage
-        ;;
+    -h|--help) usage ;;
 esac
 
 while [[ $CUR -lt $END ]]; do

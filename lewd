@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 
-function usage {
+function usage ()
+{
     echo "usage: `basename \"$0\"` [filename]" 
     exit 
 }
@@ -11,12 +12,8 @@ then
 fi
 
 case $1 in
-    -h|--help)
-        usage
-        ;;
-     *)
-        filename=$1
-        ;;
+    -h|--help) usage       ;;
+     *)        filename=$1 ;;
 esac
 
 curl -i -s -F name=$filename -F file=@$filename https://lewd.se/api.php?d=upload-tool | tail -1

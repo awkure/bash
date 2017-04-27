@@ -40,7 +40,8 @@ else
 fi
 
 
-function newclient () {
+function newclient () 
+{
 	# Generates the custom client.ovpn
 	cp /etc/openvpn/client-common.txt ~/$1.ovpn
 	echo "<ca>" >> ~/$1.ovpn

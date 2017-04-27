@@ -1,11 +1,14 @@
 #!/usr/bin/env sh
 
-function usage {
+function usage ()
+{
     echo "usage: `basename \"$0\"` [board] [thread]"
     exit
 }
 
-function proceed {
+
+function proceed ()
+{
     echo "Saving links from /${1}/ thread ${2}..."
     lynx -dump -listonly -nonumbers "https://boards.4chan.org/${1}/thread/${2}" > "tmp_links_${1}_${2}"
 
@@ -35,11 +38,7 @@ then
 fi
 
 case $1 in
-    -h|--help)
-        usage
-        ;;
-     *)
-        proceed
-        ;;
+    -h|--help) usage   ;;
+     *)        proceed ;;
 esac
 
