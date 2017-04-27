@@ -25,6 +25,7 @@ if grep -qs "CentOS release 5" "/etc/redhat-release"; then
 	exit
 fi
 
+
 if [[ -e /etc/debian_version ]]; then
 	OS=debian
 	RCLOCAL='/etc/rc.local'
@@ -38,7 +39,8 @@ else
 	exit
 fi
 
-newclient () {
+
+function newclient () {
 	# Generates the custom client.ovpn
 	cp /etc/openvpn/client-common.txt ~/$1.ovpn
 	echo "<ca>" >> ~/$1.ovpn
@@ -74,7 +76,8 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 		echo "   3) Remove OpenVPN"
 		echo "   4) Exit"
 		read -p "Select an option [1-4]: " option
-		case $option in
+		
+        case $option in
 			1) 
 			echo ""
 			echo "Tell me a name for the client cert"
@@ -83,17 +86,18 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 			cd /etc/openvpn/easy-rsa/
 			read -p "Key size (client): " -e -i 4096 KEYSIZE_CLIENT
 			read -p "Use password (client)? " -e -i y USEPASS_CLIENT
-			if [ $USEPASS_CLIENT != "y" ]; then
+            if [ $USEPASS_CLIENT != "y" ]; then
 				./easyrsa --keysize=$KEYSIZE_CLIENT build-client-full $CLIENT nopass
 			else 
 				./easyrsa --keysize=$KEYSIZE_CLIENT build-client-full $CLIENT
 			fi
-			# Generates the custom client.ovpn
+            # Generates the custom client.ovpn
 			newclient "$CLIENT"
 			echo ""
 			echo "Client $CLIENT added, certs available at ~/$CLIENT.ovpn"
 			exit
 			;;
+
 			2)
 			# This option could be documented a bit better and maybe even be simplimplified
 			# ...but what can I say, I want some sleep too
@@ -129,6 +133,8 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 			echo "Certificate for client $CLIENT revoked"
 			exit
 			;;
+
+
 			3) 
 			echo ""
 			read -p "Do you really want to remove OpenVPN? [y/n]: " -e -i n REMOVE
@@ -162,10 +168,13 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 			fi
 			exit
 			;;
+
+
 			4) exit;;
 		esac
 	done
 else
+
 	clear
 	echo 'Welcome to this quick OpenVPN "road warrior" installer'
 	echo ""
@@ -190,7 +199,7 @@ else
 	read -p "DNS [1-6]: " -e -i 1 DNS
 	echo ""
 	echo "Okay, that was all I needed. We are ready to setup your OpenVPN server now"
-	read -n1 -r -p "Press any key to continue..."
+    read -n1 -r -p "Press any key to continue..."
 		if [[ "$OS" = 'debian' ]]; then
 		apt-get update
 		apt-get install openvpn iptables openssl -y
@@ -199,11 +208,13 @@ else
 		yum install epel-release -y
 		yum install openvpn iptables openssl wget -y
 	fi
-	# An old version of easy-rsa was available by default in some openvpn packages
+	
+    # An old version of easy-rsa was available by default in some openvpn packages
 	if [[ -d /etc/openvpn/easy-rsa/ ]]; then
 		rm -rf /etc/openvpn/easy-rsa/
 	fi
-	# Get easy-rsa
+	
+    # Get easy-rsa
 	wget --no-check-certificate -O ~/EasyRSA-3.0.0.tgz https://github.com/OpenVPN/easy-rsa/releases/download/3.0.0/EasyRSA-3.0.0.tgz
 	tar xzf ~/EasyRSA-3.0.0.tgz -C ~/
 	mv ~/EasyRSA-3.0.0/ /etc/openvpn/
@@ -211,11 +222,13 @@ else
 	chown -R root:root /etc/openvpn/easy-rsa/
 	rm -rf ~/EasyRSA-3.0.0.tgz
 	cd /etc/openvpn/easy-rsa/
-	# Create the PKI, set up the CA, the DH params and the server + client certificates
-	./easyrsa init-pki
+
+    # Create the PKI, set up the CA, the DH params and the server + client certificates
+    ./easyrsa init-pki
 	./easyrsa --batch build-ca nopass
 	./easyrsa gen-dh
-	echo ""
+	
+    echo ""
         read -p "Key size (server): " -e -i 4096 KEYSIZE_SERVER
         read -p "Use password (server)? " -e -i y USEPASS_SERVER
         if [ $USEPASS_SERVER != "y" ]; then
@@ -223,7 +236,8 @@ else
 	else
 		./easyrsa --keysize=$KEYSIZE_SERVER build-server-full server
 	fi
-	echo ""
+	
+    echo ""
         echo "Finally, tell me your name for the client cert"
         echo "Please, use one word only, no special characters"
         read -p "Client name: " -e -i client CLIENT
@@ -234,22 +248,29 @@ else
          else
                  ./easyrsa --keysize=$KEYSIZE_CLIENT build-client-full $CLIENT
          fi
-	./easyrsa gen-crl
-	# Move the stuff we need
+	
+    ./easyrsa gen-crl
+	
+    # Move the stuff we need
 	cp pki/ca.crt pki/private/ca.key pki/dh.pem pki/issued/server.crt pki/private/server.key /etc/openvpn
-	# Generate server.conf
-	echo "port $PORT
-proto udp
-dev tun
-ca ca.crt
-cert server.crt
-key server.key
-dh dh.pem
-topology subnet
-server 10.8.0.0 255.255.255.0
-ifconfig-pool-persist ipp.txt" > /etc/openvpn/server.conf
-	echo 'push "redirect-gateway def1 bypass-dhcp"' >> /etc/openvpn/server.conf
-	# DNS
+	
+    # Generate server.conf
+	cat <<-EOF > /etc/openvpn/server.conf
+        port $PORT
+        proto udp
+        dev tun
+        ca ca.crt
+        cert server.crt
+        key server.key
+        dh dh.pem
+        topology subnet
+        server 10.8.0.0 255.255.255.0
+        ifconfig-pool-persist ipp.txt
+    EOF
+	
+    echo 'push "redirect-gateway def1 bypass-dhcp"' >> /etc/openvpn/server.conf
+	
+    # DNS
 	case $DNS in
 		1) 
 		# Obtain the resolvers from resolv.conf and use them for OpenVPN
@@ -277,14 +298,18 @@ ifconfig-pool-persist ipp.txt" > /etc/openvpn/server.conf
 		echo 'push "dhcp-option DNS 8.8.4.4"' >> /etc/openvpn/server.conf
 		;;
 	esac
-	echo "keepalive 10 120
-comp-lzo
-persist-key
-persist-tun
-status openvpn-status.log
-verb 0 
-crl-verify /etc/openvpn/easy-rsa/pki/crl.pem" >> /etc/openvpn/server.conf
-	# Enable net.ipv4.ip_forward for the system
+	
+    cat <<-'HEREDOC' >> /etc/openvpn/server.conf 
+        keepalive 10 120
+        comp-lzo
+        persist-key
+        persist-tun
+        status openvpn-status.log
+        verb 0 
+        crl-verify /etc/openvpn/easy-rsa/pki/crl.pem 
+    HEREDOC
+	
+    # Enable net.ipv4.ip_forward for the system
 	if [[ "$OS" = 'debian' ]]; then
 		sed -i 's|#net.ipv4.ip_forward=1|net.ipv4.ip_forward=1|' /etc/sysctl.conf
 	else
@@ -295,12 +320,15 @@ crl-verify /etc/openvpn/easy-rsa/pki/crl.pem" >> /etc/openvpn/server.conf
 			echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf
 		fi
 	fi
-	# Avoid an unneeded reboot
+	
+    # Avoid an unneeded reboot
 	echo 1 > /proc/sys/net/ipv4/ip_forward
-	# Set NAT for the VPN subnet
+	
+    # Set NAT for the VPN subnet
 	iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -j SNAT --to $IP
 	sed -i "1 a\iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -j SNAT --to $IP" $RCLOCAL
-	if pgrep firewalld; then
+	
+    if pgrep firewalld; then
 		# We don't use --add-service=openvpn because that would only work with
 		# the default port. Using both permanent and not permanent rules to
 		# avoid a firewalld reload.
@@ -309,6 +337,7 @@ crl-verify /etc/openvpn/easy-rsa/pki/crl.pem" >> /etc/openvpn/server.conf
 		firewall-cmd --permanent --zone=public --add-port=$PORT/udp
 		firewall-cmd --permanent --zone=trusted --add-source=10.8.0.0/24
 	fi
+    
     if iptables -L | grep -qE 'REJECT|DROP'; then
 		# If iptables has at least one REJECT rule, we asume this is needed.
 		# Not the best approach but I can't think of other and this shouldn't
@@ -320,7 +349,8 @@ crl-verify /etc/openvpn/easy-rsa/pki/crl.pem" >> /etc/openvpn/server.conf
 		sed -i "1 a\iptables -I FORWARD -s 10.8.0.0/24 -j ACCEPT" $RCLOCAL
 		sed -i "1 a\iptables -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT" $RCLOCAL
 	fi
-	# And finally, restart OpenVPN
+	
+    # And finally, restart OpenVPN
 	if [[ "$OS" = 'debian' ]]; then
 		# Little hack to check for systemd
 		if pgrep systemd-journal; then
@@ -337,7 +367,8 @@ crl-verify /etc/openvpn/easy-rsa/pki/crl.pem" >> /etc/openvpn/server.conf
 			chkconfig openvpn on
 		fi
 	fi
-	# Try to detect a NATed connection and ask about it to potential LowEndSpirit users
+	
+    # Try to detect a NATed connection and ask about it to potential LowEndSpirit users
 	EXTERNALIP=$(wget -qO- ipv4.icanhazip.com)
 	if [[ "$IP" != "$EXTERNALIP" ]]; then
 		echo ""
@@ -350,21 +381,25 @@ crl-verify /etc/openvpn/easy-rsa/pki/crl.pem" >> /etc/openvpn/server.conf
 			IP=$USEREXTERNALIP
 		fi
 	fi
-	# client-common.txt is created so we have a template to add further users later
-	echo "client
-dev tun
-proto udp
-remote $IP $PORT
-resolv-retry infinite
-nobind
-user nobody
-group nogroup
-persist-key
-persist-tun
-remote-cert-tls server
-comp-lzo
-verb 3" > /etc/openvpn/client-common.txt
-	# Generates the custom client.ovpn
+	
+    # client-common.txt is created so we have a template to add further users later
+	cat <<- 'HEREDOC' > /etc/openvpn/client-common.txt
+        client
+        dev tun
+        proto udp
+        remote $IP $PORT
+        resolv-retry infinite
+        nobind
+        user nobody
+        group nogroup
+        persist-key
+        persist-tun
+        remote-cert-tls server
+        comp-lzo
+        verb 3
+    HEREDOC
+	
+    # Generates the custom client.ovpn
 	newclient "$CLIENT"
 	echo ""
 	echo "Finished!"

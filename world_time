@@ -6,7 +6,6 @@ echo -e "PT:\t"     `TZ="America/Los_Angeles" datetime`
 echo -e "NYC:\t"    `TZ="America/New_York"    datetime`
 echo -e "UTC\t"     `TZ="Europe/Reijkjavik"   datetime`
 echo -e "Berlin:\t" `TZ="Europe/Berlin"       datetime`
-echo -e "Tehran:\t" `TZ="Europe/Tehran"       datetime`
 echo -e "Tokyo:\t"  `TZ="Asia/Tokyo"          datetime`
 echo -e "Rome:\t"   `TZ="Europe/Rome"         datetime`
 echo -e "Moscow:\t" `TZ="Europe/Moscow"       datetime`
