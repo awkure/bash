@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+HomePath=$HOME
+XresourcesPath="${HomePath}/.Xresources"
+echo "#include \"${1}\"" >> "${XresourcesPath}"
